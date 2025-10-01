@@ -1,0 +1,101 @@
+[
+  {
+    "crop": "Rice",
+    "latest_month": "2024-03",
+    "market_price_kes_per_kg": 80.41487902418977,
+    "price_change_pct": -51.37595188187265,
+    "avg_roi_pct": 497.6218449877667,
+    "investment_volume_kes": 133927574.5212,
+    "risk_level": "High"
+  },
+  {
+    "crop": "Sorghum",
+    "latest_month": "2024-03",
+    "market_price_kes_per_kg": 113.07647748980803,
+    "price_change_pct": -18.652802249084335,
+    "avg_roi_pct": 498.1186302344772,
+    "investment_volume_kes": 121117718.04,
+    "risk_level": "High"
+  },
+  {
+    "crop": "Potatoes",
+    "latest_month": "2024-03",
+    "market_price_kes_per_kg": 104.61281306887945,
+    "price_change_pct": 43.38334373688091,
+    "avg_roi_pct": 497.7017790235882,
+    "investment_volume_kes": 119988893.05,
+    "risk_level": "High"
+  },
+  {
+    "crop": "Cassava",
+    "latest_month": "2024-03",
+    "market_price_kes_per_kg": 53.41,
+    "price_change_pct": -56.76536147951497,
+    "avg_roi_pct": 498.76511056776775,
+    "investment_volume_kes": 115121386.818,
+    "risk_level": "High"
+  },
+  {
+    "crop": "Tea",
+    "latest_month": "2024-03",
+    "market_price_kes_per_kg": 123.9914715301189,
+    "price_change_pct": 70.90369938323602,
+    "avg_roi_pct": 496.6392786717038,
+    "investment_volume_kes": 106984563.12609999,
+    "risk_level": "High"
+  },
+  {
+    "crop": "Coffee",
+    "latest_month": "2024-03",
+    "market_price_kes_per_kg": 178.23662308652354,
+    "price_change_pct": 336.3471915411327,
+    "avg_roi_pct": 497.665016595518,
+    "investment_volume_kes": 104362872.45459999,
+    "risk_level": "High"
+  },
+  {
+    "crop": "Wheat",
+    "latest_month": "2024-03",
+    "market_price_kes_per_kg": 81.76467915387626,
+    "price_change_pct": -56.809107203065736,
+    "avg_roi_pct": 498.50670588578123,
+    "investment_volume_kes": 90810972.03,
+    "risk_level": "High"
+  },
+  {
+    "crop": "Beans",
+    "latest_month": "2024-03",
+    "market_price_kes_per_kg": 49.50879932830533,
+    "price_change_pct": -41.14503170672215,
+    "avg_roi_pct": 497.2316364061783,
+    "investment_volume_kes": 85372806.0734,
+    "risk_level": "High"
+  },
+  {
+    "crop": "Maize",
+    "latest_month": "2024-03",
+    "market_price_kes_per_kg": 86.08737528221589,
+    "price_change_pct": -55.884300870033876,
+    "avg_roi_pct": 497.73771116906937,
+    "investment_volume_kes": 78554015.358,
+    "risk_level": "High"
+  },
+  {
+    "crop": "Tomatoes",
+    "latest_month": "2024-03",
+    "market_price_kes_per_kg": 87.86504057173936,
+    "price_change_pct": 339.3252028586968,
+    "avg_roi_pct": 496.9187969722071,
+    "investment_volume_kes": 78230283.7,
+    "risk_level": "High"
+  },
+  {
+    "crop": "Error",
+    "latest_month": "2024-01",
+    "market_price_kes_per_kg": 198.26,
+    "price_change_pct": 90.90803502653337,
+    "avg_roi_pct": 497.60082500878326,
+    "investment_volume_kes": 53489846.12,
+    "risk_level": "High"
+  }
+]
