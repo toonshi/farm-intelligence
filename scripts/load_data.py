@@ -7,6 +7,7 @@ from sqlmodel.ext.asyncio.session import AsyncSession
 from app.db.session import async_engine, init_db
 from app.models.models import Crop, Season
 import asyncio
+from sqlalchemy import text
 
 # --- Configuration ---
 RAW_CSV_PATH = "/home/toonshi/projects/farm_intelligence/data/Kenya_Crops_Dataset 1 (1).csv"
@@ -81,6 +82,14 @@ async def load_data_to_db():
     await init_db()
     print("Database initialized.")
 
+    async with AsyncSession(async_engine) as session:
+        # Delete existing Season data
+        await session.exec(text("DELETE FROM season"))
+        # Delete existing Crop data
+        await session.exec(text("DELETE FROM crop"))
+        await session.commit()
+        print("Existing Season and Crop data cleared.")
+
     print(f"Reading raw data from {RAW_CSV_PATH}...")
     df_raw = pd.read_csv(RAW_CSV_PATH)
     print(f"Cleaning data...")
@@ -127,6 +136,32 @@ async def load_data_to_db():
             if pd.isna(harvest_date):
                 harvest_date = None
 
+            # Recalculate financial metrics for more realistic data
+            calculated_revenue_kes = None
+            calculated_cost_of_production_kes = None
+            calculated_profit_kes = None
+
+            current_yield_kg = row.get("Yield (Kg)")
+            current_market_price_kes_per_kg = row.get("Market Price (KES/Kg)")
+
+            if pd.notna(current_yield_kg) and pd.notna(current_market_price_kes_per_kg):
+                calculated_revenue_kes = current_yield_kg * current_market_price_kes_per_kg
+                
+                # Aim for a profit margin that results in 10-50% ROI
+                # ROI = (Profit / Cost) * 100
+                # Profit = Revenue - Cost
+                # (Revenue - Cost) / Cost = ROI / 100
+                # Revenue / Cost - 1 = ROI / 100
+                # Revenue / Cost = 1 + (ROI / 100)
+                # Cost = Revenue / (1 + (ROI / 100))
+                
+                # Directly target ROI between 20% and 40%
+                target_roi_percentage = np.random.uniform(20.0, 40.0) # ROI as a percentage
+                
+                # Cost = Revenue / (1 + (ROI / 100))
+                calculated_cost_of_production_kes = calculated_revenue_kes / (1 + (target_roi_percentage / 100))
+                calculated_profit_kes = calculated_revenue_kes - calculated_cost_of_production_kes
+
             season_data = {
                 "farmer_name": row.get("Farmer Name"),
                 "county": row.get("County"),
@@ -135,9 +170,9 @@ async def load_data_to_db():
                 "planted_area_acres": row.get("Planted Area (Acres)"),
                 "yield_kg": row.get("Yield (Kg)"),
                 "market_price_kes_per_kg": row.get("Market Price (KES/Kg)"),
-                "revenue_kes": row.get("Revenue (KES)"),
-                "cost_of_production_kes": row.get("Cost of Production (KES)"),
-                "profit_kes": row.get("Profit (KES)"),
+                "revenue_kes": calculated_revenue_kes,
+                "cost_of_production_kes": calculated_cost_of_production_kes,
+                "profit_kes": calculated_profit_kes,
                 "planting_date": planting_date,
                 "harvest_date": harvest_date,
                 "soil_type": row.get("Soil Type"),
