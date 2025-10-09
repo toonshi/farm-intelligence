@@ -1,6 +1,5 @@
 from typing import List
 from fastapi import APIRouter, Depends
-from fastapi.encoders import jsonable_encoder
 from sqlmodel import select
 from sqlmodel.ext.asyncio.session import AsyncSession
 from app.db.session import get_async_session
@@ -9,6 +8,14 @@ from app.schemas.season import SeasonSchema
 import math
 
 router = APIRouter()
+
+@router.post("/", response_model=SeasonSchema)
+async def create_season(*, session: AsyncSession = Depends(get_async_session), season: SeasonSchema):
+    db_season = Season.from_orm(season)
+    session.add(db_season)
+    await session.commit()
+    await session.refresh(db_season)
+    return db_season
 
 @router.get("/", response_model=List[SeasonSchema])
 async def read_seasons(

@@ -5,3 +5,8 @@ psycopg2-binary
 pandas
 SQLModel
 python-dotenv
+seaborn
+matplotlib
+scikit-learn
+faostat
+lightgbm

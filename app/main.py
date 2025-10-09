@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.db.session import init_db
-from app.api.endpoints import crops, seasons
+from app.api.endpoints import crops, seasons, farmers, farms
 
 app = FastAPI(title="Mshamba Intelligence API")
 
@@ -24,6 +24,8 @@ app.add_middleware(
 async def on_startup():
     await init_db()
 
+app.include_router(farmers.router, prefix="/farmers", tags=["farmers"])
+app.include_router(farms.router, prefix="/farms", tags=["farms"])
 app.include_router(crops.router, prefix="/crops", tags=["crops"])
 app.include_router(seasons.router, prefix="/seasons", tags=["seasons"])
 

@@ -5,7 +5,7 @@ from datetime import datetime
 from sqlmodel import select
 from sqlmodel.ext.asyncio.session import AsyncSession
 from app.db.session import async_engine, init_db
-from app.models.models import Crop, Season
+from app.models.models import Crop, Season, Farmer, Farm
 import asyncio
 from sqlalchemy import text
 
@@ -101,6 +101,20 @@ async def load_data_to_db():
     print(f"Cleaned data saved to {CLEANED_CSV_PATH}")
 
     async with AsyncSession(async_engine) as session:
+        # --- Create a dummy Farmer and Farm ---
+        print("Creating dummy farmer and farm...")
+        dummy_farmer = Farmer(name="John Doe", email="john.doe@example.com", hashed_password="dummy_password")
+        session.add(dummy_farmer)
+        await session.commit()
+        await session.refresh(dummy_farmer)
+
+        dummy_farm = Farm(name="Doe's Farm", county="Kiambu", owner_id=dummy_farmer.id)
+        session.add(dummy_farm)
+        await session.commit()
+        await session.refresh(dummy_farm)
+        farm_id = dummy_farm.id
+        print(f"Created dummy farm with id: {farm_id}")
+
         # --- Load Crops ---
         print("Loading unique crops...")
         unique_crops = df_cleaned["Crop Type"].dropna().unique()
@@ -138,7 +152,6 @@ async def load_data_to_db():
 
             # Recalculate financial metrics for more realistic data
             calculated_revenue_kes = None
-            calculated_cost_of_production_kes = None
             calculated_profit_kes = None
 
             current_yield_kg = row.get("Yield (Kg)")
@@ -147,31 +160,40 @@ async def load_data_to_db():
             if pd.notna(current_yield_kg) and pd.notna(current_market_price_kes_per_kg):
                 calculated_revenue_kes = current_yield_kg * current_market_price_kes_per_kg
                 
-                # Aim for a profit margin that results in 10-50% ROI
-                # ROI = (Profit / Cost) * 100
-                # Profit = Revenue - Cost
-                # (Revenue - Cost) / Cost = ROI / 100
-                # Revenue / Cost - 1 = ROI / 100
-                # Revenue / Cost = 1 + (ROI / 100)
-                # Cost = Revenue / (1 + (ROI / 100))
+                target_roi_percentage = np.random.uniform(20.0, 40.0)
                 
-                # Directly target ROI between 20% and 40%
-                target_roi_percentage = np.random.uniform(20.0, 40.0) # ROI as a percentage
-                
-                # Cost = Revenue / (1 + (ROI / 100))
-                calculated_cost_of_production_kes = calculated_revenue_kes / (1 + (target_roi_percentage / 100))
-                calculated_profit_kes = calculated_revenue_kes - calculated_cost_of_production_kes
+                calculated_total_cost = calculated_revenue_kes / (1 + (target_roi_percentage / 100))
+                calculated_profit_kes = calculated_revenue_kes - calculated_total_cost
+
+                # Distribute the total cost into granular fields
+                seed_cost_kes = calculated_total_cost * 0.15
+                fertilizer_cost_kes = calculated_total_cost * 0.20
+                pesticide_cost_kes = calculated_total_cost * 0.15
+                labor_cost_kes = calculated_total_cost * 0.30
+                machinery_cost_kes = calculated_total_cost * 0.10
+                other_costs_kes = calculated_total_cost * 0.10
+            else:
+                seed_cost_kes = None
+                fertilizer_cost_kes = None
+                pesticide_cost_kes = None
+                labor_cost_kes = None
+                machinery_cost_kes = None
+                other_costs_kes = None
+
 
             season_data = {
-                "farmer_name": row.get("Farmer Name"),
-                "county": row.get("County"),
                 "crop_variety": row.get("Crop Variety"),
                 "season": row.get("Season"),
                 "planted_area_acres": row.get("Planted Area (Acres)"),
                 "yield_kg": row.get("Yield (Kg)"),
                 "market_price_kes_per_kg": row.get("Market Price (KES/Kg)"),
                 "revenue_kes": calculated_revenue_kes,
-                "cost_of_production_kes": calculated_cost_of_production_kes,
+                "seed_cost_kes": seed_cost_kes,
+                "fertilizer_cost_kes": fertilizer_cost_kes,
+                "pesticide_cost_kes": pesticide_cost_kes,
+                "labor_cost_kes": labor_cost_kes,
+                "machinery_cost_kes": machinery_cost_kes,
+                "other_costs_kes": other_costs_kes,
                 "profit_kes": calculated_profit_kes,
                 "planting_date": planting_date,
                 "harvest_date": harvest_date,
@@ -180,9 +202,9 @@ async def load_data_to_db():
                 "fertilizer_used": row.get("Fertilizer Used"),
                 "pest_control": row.get("Pest Control"),
                 "weather_impact": row.get("Weather Impact"),
-                "farmer_contact": row.get("Farmer Contact"),
                 "notes": row.get("Notes"),
-                "crop_id": crop_id
+                "crop_id": crop_id,
+                "farm_id": farm_id
             }
             season_objects.append(Season(**season_data))
 
